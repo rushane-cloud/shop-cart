@@ -1,0 +1,178 @@
+class Product:
+    # Represents a product with its name, price, and stock quantity.
+    def __init__(self, name, price, stock):
+        self.name = name
+        self.price = price
+        self.stock = stock
+
+    # Reduces the stock if sufficient quantity is available, otherwise raises an error.
+    def reduce_stock(self, quantity):
+        if self.stock >= quantity:
+            self.stock -= quantity
+            self.check_low_stock()  # Check stock levels after reduction.
+        else:
+            raise ValueError(f"Insufficient stock for {self.name}. Available: {self.stock}")
+
+
+    # Triggers a low stock alert if stock is 5 or less.
+    def check_low_stock(self):
+        if self.stock <= 5:  # Threshold for low stock alert is set to 5.
+            print(f"LOW STOCK ALERT: {self.name} remaining: {self.stock}")
+
+
+class CartItem:
+    # Represents an item in the shopping cart with a product and its quantity.
+    def __init__(self, product, quantity):
+        self.product = product
+        self.quantity = quantity
+
+
+    def total_price(self):
+        # Calculates the total price for this cart item based on quantity and unit price.
+        return self.product.price * self.quantity
+
+
+class ShoppingCart:
+    # Represents the shopping cart and handles related operations.
+    def __init__(self):
+        self.cart_items = []  # List of CartItem objects.
+
+    # Adds an item to the cart after reducing stock from the product.
+    def add_item(self, product, quantity):
+        try:
+            product.reduce_stock(quantity)
+            self.cart_items.append(CartItem(product, quantity))
+            print(f"{quantity} of {product.name} added to cart.")
+        except ValueError as e:
+            print(e)
+
+    # Removes an item from the cart and increases the stock of the product.
+    def remove_item(self, product_name):
+        for item in self.cart_items:
+            if item.product.name.lower() == product_name.lower():
+                self.cart_items.remove(item)
+                item.product.increase_stock(item.quantity)
+                print(f"{item.product.name} removed from cart.")
+                return
+        print("Product not found in cart.")
+
+    # Displays the contents of the cart and calculates the total (before tax).
+    def view_cart(self):
+        print("\n--- Shopping Cart ---")
+        total = 0
+        for item in self.cart_items:
+            print(f"Name: {item.product.name}, Quantity: {item.quantity}, Unit Price: {item.product.price}, Total: {item.total_price}")
+            total += item.total_price()
+
+        print(f"Total (Before Tax): {total}")
+        return total
+
+    # Proceeds to checkout, applies discounts if applicable, and calculates sales tax and total amount due.
+    def checkout(self):
+        subtotal = self.view_cart()
+        discount = 0
+        if subtotal > 5000:  # A discount of 5% is applied for orders above $5000.
+            discount = subtotal * 0.05
+            print(f"\nDISCOUNT APPLIED: 5% off your purchase of ${subtotal:.2f}!")
+
+        sales_tax = (subtotal - discount) * 0.10  # Sales tax is 10%.
+        total_due = (subtotal - discount) + sales_tax
+        print("\n--- Checkout ---")
+        print(f"Subtotal: ${subtotal}")
+        if discount > 0:
+            print(f"Discount (5%): -${discount}")
+        print(f"Sales Tax (10%): ${sales_tax}")
+        print(f"Total Amount Due: ${total_due}")
+
+        # Handles payment input from the user and calculates change.
+        while True:
+            try:
+                amount_received = float(input("Enter amount received: "))
+                if amount_received < total_due:
+                    print("Error: Insufficient payment. Please enter an amount greater than or equal to the bill.")
+                else:
+                    change = amount_received - total_due
+                    print(f"Change: ${change}")
+                    self.generate_receipt(subtotal, discount, sales_tax, total_due, amount_received, change)
+                    break
+            except ValueError:
+                print("Error: Invalid input. Please enter a valid number.")
+
+    # Generates a receipt with details of the purchase.
+    def generate_receipt(self, subtotal, discount, sales_tax, total_due, amount_received, change):
+        print("\n--- Receipt ---")
+        print("___Best Buy___")
+        print("Purchased Items:")
+        for item in self.cart_items:
+            print(f"{item.product.name} - Quantity: {item.quantity}, Unit Price: {item.product.price}, Total: {item.total_price}")
+        print(f"Subtotal: ${subtotal}")
+        if discount > 0:
+            print(f"Discount (5%): -${discount}")
+        print(f"Sales Tax (10%): ${sales_tax}")
+        print(f"Total Due: ${total_due}")
+        print(f"Amount Paid: ${amount_received}")
+        print(f"Change: ${change}")
+        print("Thank you for shopping with us!")
+        self.cart_items.clear()  # Clears the cart after purchase.
+
+
+class Store:
+    # Represents the store with a predefined catalog of products.
+    def __init__(self):
+        self.products = [
+            Product("BUN", 300, 10),
+            Product("SODA", 500, 15),
+            Product("RUM", 7000, 8),
+            Product("Milk", 1200, 5),
+            Product("Bread", 1500, 12),
+            Product("Eggs", 2000, 30),
+            Product("Juice", 1500, 10),
+            Product("Rice", 5000, 20),
+            Product("Sugar", 900, 18),
+            Product("Salt", 700, 25),
+        ]
+        self.cart = ShoppingCart()  # Shopping cart associated with the store.
+
+    # Displays the product catalog along with price and stock details.
+    def display_catalog(self):
+        print("\n--- Product Catalog ---")
+        for product in self.products:
+            print(f"Name: {product.name}, Price: {product.price}, Stock: {product.stock}")
+
+
+def main():
+    # Main function to provide an interactive menu for the user.
+    store = Store()
+
+    while True:
+        print("\nOptions: 1. View Catalog, 2. Add to Cart, 3. Remove from Cart, 4. View Cart, 5. Checkout, 6. Exit")
+        try:
+            choice = int(input("Enter your choice: "))
+            if choice == 1:
+                store.display_catalog()
+            elif choice == 2:
+                product_name = input("Enter product name: ").lower()
+                quantity = int(input("Enter quantity: "))
+                for product in store.products:
+                    if product.name.lower() == product_name:
+                        store.cart.add_item(product, quantity)
+                        break
+                else:
+                    print("Product not found.")
+            elif choice == 3:
+                product_name = input("Enter product name to remove: ").lower()
+                store.cart.remove_item(product_name)
+            elif choice == 4:
+                store.cart.view_cart()
+            elif choice == 5:
+                store.cart.checkout()
+            elif choice == 6:
+                break
+            else:
+                print("Invalid choice. Please select 1 - 5 to continue.")
+        except ValueError:
+            print("Error: Please enter a valid number.")
+
+
+if __name__ == "__main__":
+    main()
