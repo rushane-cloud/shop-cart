@@ -1,0 +1,42 @@
+Shopping Cart System
+Overview
+This Python-based shopping cart system is simple but functional. The system allows customers to browse the store catalog, add items to their shopping cart, remove unwanted products, review the contents of their cart, and complete the checkout process. The system manages inventory, applies discounts, calculates taxes, and prints receipts.
+ 
+ 
+ 
+ Features :
+ 
+• Product Catalog: Provides information on available products, including their prices and stock levels.  
+• Add items to your cart and verify their availability.  
+• Remove items from the cart to update stock.
+
+• View Cart: Confirm cart contents and total cost before checking out.
+
+• Checkout Process: Apply discounts, compute tax, accept payments, and generate receipts.
+
+• Stock Alerts: Receive updates when stock runs low.
+ 
+User Guide
+1 Start the program
+2 Choose an option:
+◦ 1 - View available products.
+◦ 2 - Add an item to the cart.
+◦ 3 - Remove an item from the cart.
+◦ 4 - View cart contents.
+◦ 5 - Checkout.
+3 Follow the prompts to complete actions.
+Pricing & Discounts ￼
+• 5% Discount on purchases over $5000.
+• A 10% sales tax will be applied after the discount.
+
+Assumptions & Limitations
+Assumptions
+1. User Input: Users enter valid numbers for quantities and payments.
+2. Product Data: The initial product list is predefined.
+3. Currency: All prices are in USD (no currency conversion).
+Limitations
+1. Data Loss: Product stock and cart data reset on program exit.
+2. Partial Removal: Removing items from the cart deletes the entire entry (no partial quantities).
+3. Discount Logic: The 5% discount applies only to subtotals exceeding $5,000.
+4. Low Stock Alerts: Alerts are triggered during stock updates but not displayed post-checkout.
+6. Receipts: Lack timestamps or order IDs.
